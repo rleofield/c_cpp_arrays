@@ -1,0 +1,7 @@
+/Debug/
+/*.vcxproj.filters
+/*.vcxproj
+/*.pro.user
+/c_cpp_arrays
+/Makefile
+/.tmp/

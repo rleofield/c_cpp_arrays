@@ -9,6 +9,8 @@
 #include <malloc.h>
 #include <memory.h>
 #include <array>
+#include <boost/scoped_ptr.hpp>
+#include <boost/scoped_array.hpp>
 
 using namespace std;
 using std::vector;
@@ -113,31 +115,7 @@ void c_demo_malloc( void ) {
 // constructor runs for each object in 'new'
 // destructor runs for each object in delete[]
 void cpp_demo_new(  ) {
-   cpp_a* ptr_cpp_a  = nullptr;
 
-	// Generate an array of relative cross positions
-   if( nullptr == ptr_cpp_a )
-	{
-
-		ptr_cpp_a = new cpp_a[ size ];
-		
-	}
-	// use the array
-	ptr_cpp_a[2] = 4;
-	*(ptr_cpp_a + 4) = 7;
-
-
-   if( nullptr!=ptr_cpp_a )
-	{
-		delete[] ptr_cpp_a;
-      ptr_cpp_a = nullptr;
-	}
-
-  return ;
-}
-
-
-void cpp_demo_smart_pointer( ) {
    cpp_a* ptr_cpp_a  = nullptr;
 
    // Generate an array of relative cross positions
@@ -157,6 +135,27 @@ void cpp_demo_smart_pointer( ) {
       delete[] ptr_cpp_a;
       ptr_cpp_a = nullptr;
    }
+
+  return ;
+}
+
+
+void cpp_demo_smart_pointer( ) {
+   boost::scoped_array<cpp_a> ptr_cpp_a(new cpp_a[size]);
+
+
+   // use the array
+   ptr_cpp_a[2] = 4;
+   ptr_cpp_a[4] = 6;
+
+   std::cout << ptr_cpp_a[2].b << endl;
+
+   // not allowed
+   //*(ptr_cpp_a + 4) = 7;
+
+
+  // implicit delete[]
+
 
   return ;
 }
@@ -201,7 +200,8 @@ int main( void ) {
    int b = sizeof( cpp_a);
    c_demo_double_new(); 
    c_demo_malloc();   
-   cpp_demo_new();    
+   cpp_demo_new();
+   cpp_demo_smart_pointer();
    cpp_demo_STL();    
    return 0;
 }
