@@ -67,7 +67,7 @@ void c_demo_double_new(  ) {
       for( size_t i = 0; i < size; i++ )
 		{
          if( NULL!=ptr_c_struct[i] )
-            delete ptr_c_struct[i];  //-> ?? problem with applying the 'delete' operator to SVPoint
+            delete ptr_c_struct[i];  //-> ?? problem with applying the 'delete' operator to
 		}
       delete[] ptr_c_struct;
       ptr_c_struct = NULL;
