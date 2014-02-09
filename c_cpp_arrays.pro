@@ -71,4 +71,8 @@ LIBS += -L$$PWD/../libpngjpegz/ -lpngjpegz
 LIBS += -lboost_system
 LIBS += -lboost_filesystem
 
+OTHER_FILES += \
+    README.md \
+    lgpl-3.0.txt
+
 
