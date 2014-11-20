@@ -18,146 +18,205 @@ using std::array;
 
 
 // simple typedef for a struct
+// no init, no  destroy
 // sizeof == 4
 typedef 
 struct  {
 	int b;
-} c_struct;
+} c_struct_b;
+
+// better 
+
+struct c_struct_b0 {
+   int b;
+} ;
 
 
 // c++ struct, no typedef,
+// with init
+// wirh destroy
 // sizeof == 4
-// with default constructor, for std::vector
+// with default constructor, std::vector needs this
 // with one parameter contructor (type cast)
-struct cpp_a{
-	int b;
-	
-	cpp_a():b(0){}
-	cpp_a(int i):b(i){}
+struct cpp_b{
+   int b;
+
+	// default constructur, needed for STL container
+	cpp_b():b(0){
+		cout << "default constructor" << endl;
+   }
+
+	// cast constructor, casts autmatically an int to an object
+	cpp_b(int i):b(i){
+		cout << "cast constructor" << endl;
+   }
+	~cpp_b(){
+		cout << "destruktor" << endl;
+   }
+
+	int getb()const{ return b; }
+	void setb(int b_){ b = b_; }
 };
 
 
-const size_t size= 10;
+const size_t size = 10;
 
 // C ways for an array
 // list of pointers to objects
-// very complicated, but widely used, why? not knwon
-// contructor didn't run
-void c_demo_double_new(  ) {
+//   very complicated, but widely used, why? -  not known, 
+void c_demo_double_new( ) {
 
-   c_struct** ptr_c_struct = NULL;
+	// pointer to array of pointers
+	c_struct_b** ptr_c_struct = NULL;
 
-	// Generate an array of relative cross positions
-   if( NULL == ptr_c_struct )
+	if( NULL == ptr_c_struct )
 	{
-      ptr_c_struct = new c_struct*[ size ];
-      for( size_t i = 0; i<size; i++ )
+		ptr_c_struct = new c_struct_b*[ size ];
+		for( size_t i = 0; i<size; i++ )
 		{
-         ptr_c_struct[i] = new c_struct();
-		}
-	}
-	// use the array
-   (*ptr_c_struct[2]).b = 4;
+			// pointer to new object
+			ptr_c_struct[i] = new c_struct_b();
+      }
+   }
+
+   // use the array
+   ( *ptr_c_struct[2] ).b = 4;
    ptr_c_struct[4]->b = 7;
 
+	// simulate early return
+	if( ptr_c_struct[4]->b == 7 ){
 
 
-   if( NULL!=ptr_c_struct )
+		// no delete[], --> memory leak
+		return;
+      }
+
+	// delete at end, also complicated
+	if( NULL!=ptr_c_struct )
 	{
-      for( size_t i = 0; i < size; i++ )
+		for( size_t i = 0; i < size; i++ )
 		{
-         if( NULL!=ptr_c_struct[i] )
-            delete ptr_c_struct[i];  //-> ?? problem with applying the 'delete' operator to
+			if( NULL!=ptr_c_struct[i] )
+				delete ptr_c_struct[i];  //-> ?? problem with applying the 'delete' operator, which, [] or other
 		}
       delete[] ptr_c_struct;
       ptr_c_struct = NULL;
-	}
+   }
 
    return ;
 }
 
 // pointer to array of objects
-// contructor didn't run
+// contructor didn't run, must be called by program
 void c_demo_malloc( void ) {
 
-   c_struct* ptr_c_struct  = NULL;
+	c_struct_b* ptr_c_struct  = NULL;
 
-	// Generate an array of relative cross positions
-   if( NULL == ptr_c_struct )
+	if( NULL == ptr_c_struct )
 	{
 
-      ptr_c_struct = (c_struct*)malloc( size * sizeof(c_struct) );
-      memset( ptr_c_struct, 0, size * sizeof(c_struct) );
+		ptr_c_struct = (c_struct_b*)malloc( size * sizeof(c_struct_b) );
+		// Konstruktor auf 'C' Art, alle Werte werden auf 0 gesetzt.
+		memset( ptr_c_struct, 0, size * sizeof(c_struct_b) );
+   }
+
+   // use the array
+	c_struct_b* ptr_use = ptr_c_struct;
+   ptr_use += 2;
+   ptr_use->b = 4;
+	(*ptr_use).b = 4;  // ok
+	//(*ptr_use) = 4;  // error, C can't cats an int to an object, C++ can do this
+
+   ptr_use += 2;
+   ptr_use->b = 7;
+
+	// simulate early return
+	if( ptr_use->b == 7 ){
+
+		// no delete[], --> memory leak
+		return;
 	}
-	// use the array
-   c_struct* ptr_use = ptr_c_struct;
-	ptr_use += 2;
-	ptr_use->b = 4;
-
-	ptr_use += 2;
-	ptr_use->b = 7;
 
 
-   if( NULL!=ptr_c_struct )
+
+	if( NULL!=ptr_c_struct )
 	{
-      free(ptr_c_struct);
+		// no call of destructors
+		// memory leak, if class contains pointers
+      free( ptr_c_struct );
       ptr_c_struct = NULL;
-	}
+   }
 
    return ;
 }
 
 
-// C++ ways for an array
+// C++ ways for an array, in old C style, dangerous
 
 // replacement of 'malloc' with 'operator new'
 // code ist similar to C code
 // constructor runs for each object in 'new'
 // destructor runs for each object in delete[]
-void cpp_demo_new(  ) {
+void cpp_demo_new( ) {
 
-   cpp_a* ptr_cpp_a  = nullptr;
+	cpp_b* ptr_cpp_b  = nullptr;
 
    // Generate an array of relative cross positions
-   if( nullptr == ptr_cpp_a )
-   {
+	if( nullptr == ptr_cpp_b )
+	{
 
-      ptr_cpp_a = new cpp_a[ size ];
+		// constructor ist called
+		ptr_cpp_b = new cpp_b[ size ];
 
    }
+
    // use the array
-   ptr_cpp_a[2] = 4;
-   *(ptr_cpp_a + 4) = 7;
+	ptr_cpp_b[2].b = 4;
+	(*(ptr_cpp_b + 4)).b = 7;  // ok
+	(*(ptr_cpp_b + 4)) = 7;    // also ok, cast constructor is applied, se above
 
+	// simulate early return
+	if( ptr_cpp_b[4].b == 7 ){
+		// no delete[], --> memory leak
+		return;
+	}
 
-   if( nullptr!=ptr_cpp_a )
-   {
-      delete[] ptr_cpp_a;
-      ptr_cpp_a = nullptr;
+	if( nullptr!=ptr_cpp_b )
+	{
+		// Destruktor Aufruf
+		delete[] ptr_cpp_b;
+		ptr_cpp_b = nullptr;
    }
 
-  return ;
+   return ;
 }
 
 
+// replacement of pointer with smart pointer
+// code looks very different to C code
 void cpp_demo_smart_pointer( ) {
-   boost::scoped_array<cpp_a> ptr_cpp_a(new cpp_a[size]);
+	boost::scoped_array<cpp_b> smart_ptr_cpp_b(new cpp_b[size]);
 
 
    // use the array
-   ptr_cpp_a[2] = 4;
-   ptr_cpp_a[4] = 6;
+	smart_ptr_cpp_b[2] = 4;  // über cast Konstruktor von cpp_b
+	smart_ptr_cpp_b[4].b = 6;
 
-   std::cout << ptr_cpp_a[2].b << endl;
+	// simulate early return
+	if( smart_ptr_cpp_b[4].b == 6 ){
 
-   // not allowed
-   //*(ptr_cpp_a + 4) = 7;
+		// implicit delete[] and call of all destructors
+      return;
+   }
+
+ 
+	std::cout << smart_ptr_cpp_b[2].b << endl;
 
 
-  // implicit delete[]
+	// implicit delete[] and call of all destructors
 
 
-  return ;
+   return ;
 }
 
 // dynamically allocated STL vector
@@ -166,13 +225,22 @@ void cpp_demo_smart_pointer( ) {
 // constructor runs for each object in the 'vector' constructor of 'vector'
 // destructor runs for each object in destructor of vector at the end of scope
 void cpp_demo_STL( void ) {
-   
-	vector<cpp_a> vc_a(size);
+
+	// create a vector with size elements, all are initialized
+	vector<cpp_b> vector_b(size);
 
 	// use the array
-	vc_a[2] = 4;
-	vc_a[4] = 7;
+	vector_b[2] = 4;
+	vector_b[4].b = 7; // cast from int to class, with cast constructor
 
+	// simulate early return
+	if( vector_b[4].b == 7 ){
+
+		// implicit delete[] and call of all destructors 
+		return;
+	}
+
+	// implicit delete[] and call of all destructors
    return ;
 }
 
@@ -185,24 +253,26 @@ void cpp_demo_STL( void ) {
 // destructor runs for each object in destructor of vector at the end of scope
 void cpp_demo_array( void ) {
 
-   array<cpp_a,size> values;
+	// erzeuge size Elemente, alle sind initalisiert
+	array<cpp_b,size> values;
 
    // use the array
-   values[2] = 4;
+	values[2].b = 4;
    values[4] = 7;
+	// implicit delete[] and call of all destructors
    return ;
 }
 
 
 
 int main( void ) {
-   int i = sizeof(c_struct);
-   int b = sizeof( cpp_a);
-   c_demo_double_new(); 
-   c_demo_malloc();   
-   cpp_demo_new();
-   cpp_demo_smart_pointer();
-   cpp_demo_STL();    
+	int i = sizeof(c_struct_b);
+	int b = sizeof( cpp_b);
+   c_demo_double_new();
+   c_demo_malloc();
+	cpp_demo_new();
+	cpp_demo_smart_pointer();
+	cpp_demo_STL();    
    return 0;
 }
 
