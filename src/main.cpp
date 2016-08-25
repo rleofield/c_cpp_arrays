@@ -265,8 +265,19 @@ void cpp_demo_array( void ) {
 
 
 int main( void ) {
-   int i = sizeof( c_struct_b );
-   int b = sizeof( cpp_b );
+
+   string sex;
+try{
+   std::string s(nullptr);
+   }
+   catch( std::exception &ex)
+   {
+      sex= ex.what();
+   }
+
+
+   //int i = sizeof( c_struct_b );
+   //int b = sizeof( cpp_b );
    c_demo_double_new();
    c_demo_malloc();
    cpp_demo_new();
