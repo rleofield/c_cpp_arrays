@@ -6,3 +6,5 @@
 /Makefile
 /.tmp/
 /astyle.sh
+*.pro.user.3.2-pre1
+*.qmake.stash
