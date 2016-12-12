@@ -24,7 +24,7 @@ QMAKE_CXXFLAGS_DEBUG += -Wcast-align
 QMAKE_CXXFLAGS_DEBUG += -Wcast-qual
 QMAKE_CXXFLAGS_DEBUG += -Wconversion
 QMAKE_CXXFLAGS_DEBUG += -Weffc++
-QMAKE_CXXFLAGS_DEBUG += -Werror
+#QMAKE_CXXFLAGS_DEBUG += -Werror
 QMAKE_CXXFLAGS_DEBUG += -Wextra
 QMAKE_CXXFLAGS_DEBUG += -Wno-zero-as-null-pointer-constant
 QMAKE_CXXFLAGS_DEBUG += -Wold-style-cast
@@ -36,7 +36,7 @@ QMAKE_CXXFLAGS_DEBUG += -Wshadow
 QMAKE_CXXFLAGS_DEBUG += -Wunused-but-set-variable
 QMAKE_CXXFLAGS_DEBUG += -Wunused-function
 QMAKE_CXXFLAGS_DEBUG += -Wunused-parameter
-QMAKE_CXXFLAGS_DEBUG += -Wunused-variable
+QMAKE_CXXFLAGS_DEBUG += -Wno-unused-variable
 QMAKE_CXXFLAGS_DEBUG += -Wwrite-strings
 
 
